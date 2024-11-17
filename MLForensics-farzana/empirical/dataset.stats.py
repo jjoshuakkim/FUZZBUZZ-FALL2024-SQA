@@ -46,6 +46,7 @@ def getBranch(path):
     else:
         return 'master' 
 
+# Testing pipeline build
 def getFileLength(file_):
     return sum(1 for line in open(file_, encoding='latin-1'))
 
