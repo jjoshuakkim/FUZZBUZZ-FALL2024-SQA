@@ -1,3 +1,47 @@
+
+import logging
+
+# Configure forensic logging
+logging.basicConfig(
+    filename="forensics_log.txt",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+def log_forensics(method):
+    def wrapper(*args, **kwargs):
+        try:
+            logging.info(f"Method {method.__name__} called with args: {args}, kwargs: {kwargs}")
+            result = method(*args, **kwargs)
+            logging.info(f"Method {method.__name__} returned: {result}")
+            return result
+        except Exception as e:
+            logging.error(f"Error in method {method.__name__}: {e}")
+            raise e
+    return wrapper
+
+import logging
+
+# Configure forensic logging
+logging.basicConfig(
+    filename="forensics_log.txt",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# Example forensic enhancement
+def log_forensics(method):
+    def wrapper(*args, **kwargs):
+        try:
+            logging.info(f"Method {method.__name__} called with args: {args}, kwargs: {kwargs}")
+            result = method(*args, **kwargs)
+            logging.info(f"Method {method.__name__} returned: {result}")
+            return result
+        except Exception as e:
+            logging.error(f"Error in method {method.__name__}: {e}")
+            raise e
+    return wrapper
+
 '''
 Akond Rahman 
 Nov 15, 2020
@@ -112,3 +156,4 @@ if __name__=='__main__':
     print('*'*100 )
     print('Ended at:', giveTimeStamp() )
     print('*'*100 )
+

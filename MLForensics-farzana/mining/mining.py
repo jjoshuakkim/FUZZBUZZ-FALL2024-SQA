@@ -1,3 +1,46 @@
+import logging
+
+# Configure forensic logging
+logging.basicConfig(
+    filename="forensics_log.txt",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+def log_forensics(method):
+    def wrapper(*args, **kwargs):
+        try:
+            logging.info(f"Method {method.__name__} called with args: {args}, kwargs: {kwargs}")
+            result = method(*args, **kwargs)
+            logging.info(f"Method {method.__name__} returned: {result}")
+            return result
+        except Exception as e:
+            logging.error(f"Error in method {method.__name__}: {e}")
+            raise e
+    return wrapper
+
+import logging
+
+# Configure forensic logging
+logging.basicConfig(
+    filename="forensics_log.txt",
+    level=logging.DEBUG,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
+# Example forensic enhancement
+def log_forensics(method):
+    def wrapper(*args, **kwargs):
+        try:
+            logging.info(f"Method {method.__name__} called with args: {args}, kwargs: {kwargs}")
+            result = method(*args, **kwargs)
+            logging.info(f"Method {method.__name__} returned: {result}")
+            return result
+        except Exception as e:
+            logging.error(f"Error in method {method.__name__}: {e}")
+            raise e
+    return wrapper
+
 import os
 import pandas as pd 
 import numpy as np
