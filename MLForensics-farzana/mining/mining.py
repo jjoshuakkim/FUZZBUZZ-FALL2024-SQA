@@ -53,42 +53,53 @@ from git import Repo
 from git import exc 
 
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
 def giveTimeStamp():
-  tsObj = time.time()
-  strToret = datetime.fromtimestamp(tsObj).strftime('%Y-%m-%d %H:%M:%S')
-  return strToret
-  
+    tsObj = time.time()
+    strToret = datetime.fromtimestamp(tsObj).strftime('%Y-%m-%d %H:%M:%S')
+    logging.info(f"Timestamp generated: {strToret}")
+    return strToret
 
 def deleteRepo(dirName, type_):
+    logging.info(f"Attempting to delete repository: {dirName} of type {type_}")
     print(':::' + type_ + ':::Deleting ', dirName)
     try:
         if os.path.exists(dirName):
             shutil.rmtree(dirName)
+            logging.info(f"Successfully deleted repository: {dirName}")
     except OSError:
-        print('Failed deleting, will try manually')  
-        
-        
+        logging.error(f"Failed to delete repository: {dirName}. Manual deletion may be required.")
+        print('Failed deleting, will try manually')
+
 def dumpContentIntoFile(strP, fileP):
-    fileToWrite = open( fileP, 'w')
-    fileToWrite.write(strP )
+    logging.info(f"Writing content to file: {fileP}")
+    fileToWrite = open(fileP, 'w')
+    fileToWrite.write(strP)
     fileToWrite.close()
-    return str(os.stat(fileP).st_size)
-  
-  
+    file_size = str(os.stat(fileP).st_size)
+    logging.info(f"Content written to {fileP}. File size: {file_size} bytes")
+    return file_size
+
 def makeChunks(the_list, size_):
-    for i in range(0, len(the_list), size_):
-        yield the_list[i:i+size_]
-        
-        
+    logging.info(f"Splitting list of {len(the_list)} items into chunks of size {size_}")
+    chunks = list(the_list[i:i+size_] for i in range(0, len(the_list), size_))
+    logging.info(f"Created {len(chunks)} chunks")
+    for chunk in chunks:
+        yield chunk
+
 def cloneRepo(repo_name, target_dir):
+    logging.info(f"Attempting to clone repository: {repo_name} into {target_dir}")
     cmd_ = "git clone " + repo_name + " " + target_dir 
     try:
-       subprocess.check_output(['bash','-c', cmd_])    
+       subprocess.check_output(['bash','-c', cmd_])
+       logging.info(f"Successfully cloned repository: {repo_name}")
     except subprocess.CalledProcessError:
-       print('Skipping this repo ... trouble cloning repo:', repo_name )
-
+       logging.error(f"Failed to clone repository: {repo_name}")
+       print('Skipping this repo ... trouble cloning repo:', repo_name)
 
 def checkPythonFile(path2dir): 
+    logging.info(f"Analyzing Python files in directory: {path2dir}")
     usageCount = 0
     patternDict = ['sklearn', 'h5py', 'gym', 'rl', 'tensorflow', 'keras', 'tf', 'stable_baselines', 'tensorforce', 'rl_coach', 'pyqlearning', 'MAMEToolkit', 'chainer', 'torch', 'chainerrl']
     for root_, dirnames, filenames in os.walk(path2dir):
@@ -96,6 +107,7 @@ def checkPythonFile(path2dir):
             full_path_file = os.path.join(root_, file_) 
             if(os.path.exists(full_path_file)):
                 if ((file_.endswith('py')) or (file_.endswith('ipynb')))  :
+                    logging.info(f"Analyzing file: {full_path_file}")
                     f = open(full_path_file, 'r', encoding='latin-1')
                     pythonFileContent = f.read()
                     pythonFileContent = pythonFileContent.split('\n') 
@@ -104,8 +116,10 @@ def checkPythonFile(path2dir):
                         for item_ in patternDict:
                             if(item_ in content_):
                                 usageCount = usageCount + 1
-                                print('item_->->->',  content_)                    
-    return usageCount  
+                                logging.info(f"Found pattern '{item_}' in line: {content_}")
+                                print('item_->->->',  content_)
+    logging.info(f"Analysis complete. Total pattern matches: {usageCount}")
+    return usageCount
     
 
 def days_between(d1_, d2_): ## pass in date time objects, if string see commented code 
