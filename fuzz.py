@@ -1,15 +1,23 @@
-'''
+"""
 Author: Aidan Kiser
 Version: 28 November 2024
-'''
+"""
 
 import logging
-from hypothesis import given, strategies as st
+import random
+import string
 
-# Configure logging
-logging.basicConfig(filename="fuzz_log.txt", level=logging.DEBUG, format="%(asctime)s - %(message)s")
+# Configure logging to both console and file
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s - %(message)s",
+    handlers=[
+        logging.FileHandler("fuzz_log.txt"),
+        logging.StreamHandler()
+    ]
+)
 
-# Method placeholders for fuzz testing (import actual methods in production)
+# Method placeholders for fuzz testing
 def getAllSLOC(code):
     return len(code.split('\n'))
 
@@ -29,50 +37,56 @@ def runFameML(repo_url):
         return "Repository analyzed"
     return "Invalid URL"
 
-# Fuzzing functions
-@given(st.text())
-def fuzz_getAllSLOC(code):
-    try:
-        result = getAllSLOC(code)
-        logging.info(f"getAllSLOC('{code[:20]}...') = {result}")
-    except Exception as e:
-        logging.error(f"Error in getAllSLOC('{code[:20]}...'): {e}")
-
-@given(st.text())
-def fuzz_getFileLength(file_content):
-    try:
-        result = getFileLength(file_content)
-        logging.info(f"getFileLength('{file_content[:20]}...') = {result}")
-    except Exception as e:
-        logging.error(f"Error in getFileLength('{file_content[:20]}...'): {e}")
-
-@given(st.text())
-def fuzz_checkLoggingPerData(data):
-    try:
-        result = checkLoggingPerData(data)
-        logging.info(f"checkLoggingPerData('{data[:20]}...') = {result}")
-    except Exception as e:
-        logging.error(f"Error in checkLoggingPerData('{data[:20]}...'): {e}")
-
-@given(st.text())
-def fuzz_getModelLoadCount(data):
-    try:
-        result = getModelLoadCount(data)
-        logging.info(f"getModelLoadCount('{data[:20]}...') = {result}")
-    except Exception as e:
-        logging.error(f"Error in getModelLoadCount('{data[:20]}...'): {e}")
-
-@given(st.text())
-def fuzz_runFameML(repo_url):
-    try:
-        result = runFameML(repo_url)
-        logging.info(f"runFameML('{repo_url}') = {result}")
-    except Exception as e:
-        logging.error(f"Error in runFameML('{repo_url}'): {e}")
+# Helper function to generate random strings
+def random_string(length=10):
+    return ''.join(random.choices(string.ascii_letters + string.digits, k=length))
 
 if __name__ == "__main__":
-    fuzz_getAllSLOC()
-    fuzz_getFileLength()
-    fuzz_checkLoggingPerData()
-    fuzz_getModelLoadCount()
-    fuzz_runFameML()
+    logging.info("Starting fuzz testing...")
+
+    # Fuzz getAllSLOC
+    for _ in range(5):
+        code = random_string(50) + "\n" + random_string(50)
+        try:
+            result = getAllSLOC(code)
+            logging.info(f"getAllSLOC('{code[:20]}...') = {result}")
+        except Exception as e:
+            logging.error(f"Error in getAllSLOC('{code[:20]}...'): {e}")
+
+    # Fuzz getFileLength
+    for _ in range(5):
+        file_content = random_string(100)
+        try:
+            result = getFileLength(file_content)
+            logging.info(f"getFileLength('{file_content[:20]}...') = {result}")
+        except Exception as e:
+            logging.error(f"Error in getFileLength('{file_content[:20]}...'): {e}")
+
+    # Fuzz checkLoggingPerData
+    for _ in range(5):
+        data = random_string(50)
+        try:
+            result = checkLoggingPerData(data)
+            logging.info(f"checkLoggingPerData('{data[:20]}...') = {result}")
+        except Exception as e:
+            logging.error(f"Error in checkLoggingPerData('{data[:20]}...'): {e}")
+
+    # Fuzz getModelLoadCount
+    for _ in range(5):
+        data = "model " * random.randint(1, 10)
+        try:
+            result = getModelLoadCount(data)
+            logging.info(f"getModelLoadCount('{data[:20]}...') = {result}")
+        except Exception as e:
+            logging.error(f"Error in getModelLoadCount('{data[:20]}...'): {e}")
+
+    # Fuzz runFameML
+    for _ in range(5):
+        repo_url = random.choice(["http://github.com/repo", "invalid_url"])
+        try:
+            result = runFameML(repo_url)
+            logging.info(f"runFameML('{repo_url}') = {result}")
+        except Exception as e:
+            logging.error(f"Error in runFameML('{repo_url}'): {e}")
+
+    logging.info("Fuzz testing completed.")
