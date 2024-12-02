@@ -18,6 +18,7 @@ logging.basicConfig(
 )
 
 # Method placeholders for fuzz testing
+# Testing github
 def getAllSLOC(code):
     return len(code.split('\n'))
 
